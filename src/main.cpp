@@ -17,10 +17,10 @@ glm::vec3 pos = glm::vec3(0.0f);
 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 
-float deltaTime = 0.0f, lastFrame = 0.0f, speed = 2.5f, sensitivity = 0.1f;
-float yaw = 0.0f, pitch = 0.0f;
-float lastX, lastY;
-bool firstMouse = true;
+float delta_time = 0.0f, last_frame = 0.0f, speed = 2.5f, sensitivity = 0.1f;
+float yaw = -90.0f, pitch = 0.0f, fov = 45.0f;
+float lastX = 800.0f/ 2.0f, lastY = 600.0f/ 2.0f;
+bool first_mouse = true;
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -59,6 +59,7 @@ int main()
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetCursorPosCallback(window, mouseCallback);
+  glfwSetScrollCallback(window, scrollCallback);
 
   float vertices[] = {
       -0.5f, -0.5f, 0.0f, // left
@@ -66,7 +67,7 @@ int main()
       0.0f, 0.5f, 0.0f    // top
   };
 
-  Shader triangle("../src/shaders/default.vs", "../src/shaders/default.fs");
+  Shader triangle("../src/shaders/object.vs", "../src/shaders/default.fs");
 
   GLuint VAO, VBO;
   glGenVertexArrays(1, &VAO);
@@ -88,10 +89,24 @@ int main()
   // main event loop
   while (!glfwWindowShouldClose(window))
   {
+    float current_frame = glfwGetTime();
+    delta_time = current_frame - last_frame;
+    last_frame = current_frame;
+
     glClear(GL_COLOR_BUFFER_BIT);
     processInput(window);
 
     triangle.use();
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::lookAt(pos, pos + front, up);
+    glm::mat4 projection = glm::perspective(glm::radians(fov), 16.0f / 9.0f, 0.1f, 100.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -3.0f));
+    // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    triangle.setMat4("model", model);
+    triangle.setMat4("view", view);
+    triangle.setMat4("projection", projection);
+
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -120,15 +135,16 @@ void processInput(GLFWwindow *window)
 
 void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 {
+  // std::cout << "mouse event" << std::endl;
   float x = static_cast<float>(xpos);
   float y = static_cast<float>(ypos);
 
-  if (firstMouse)
+  if (first_mouse)
   {
     std::cout << "First mouse" << std::endl;
     lastX = x;
     lastY = y;
-    firstMouse = false;
+    first_mouse = false;
   }
 
   float xoffset = x - lastX;
@@ -149,8 +165,20 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
   glm::vec3 direction;
   direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  direction.y = cos(glm::radians(pitch));
+  direction.y = sin(glm::radians(pitch));
   direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
-  front = direction;
+  front = glm::normalize(direction);
+  // std::cout << front.x << "," << front.y << "," << front.z << std::endl;
+}
+
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
+{
+  std::cout << "scorll event" << std::endl;
+
+  fov -= (float)yoffset;
+  if (fov < 1.0f)
+    fov = 1.0f;
+  if (fov > 45.0f)
+    fov = 45.0f;
 }

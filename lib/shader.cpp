@@ -91,6 +91,36 @@ void Shader::checkCompileErrors(GLuint id, std::string type)
   }
 }
 
+GLuint Shader::getId()
+{
+  return this->ID;
+}
+
+void Shader::setInt(const std::string uniform_name, int data)
+{
+  glUniform1i(glGetUniformLocation(this->ID, uniform_name.c_str()), data);
+}
+
+void Shader::setFloat(const std::string uniform_name, float data)
+{
+  glUniform1f(glGetUniformLocation(this->ID, uniform_name.c_str()), data);
+}
+
+void Shader::setBool(const std::string uniform_name, bool data)
+{
+  glUniform1i(glGetUniformLocation(this->ID, uniform_name.c_str()), data);
+}
+
+void Shader::setVec3(const std::string uniform_name, glm::vec3 data)
+{
+  glUniform3fv(glGetUniformLocation(this->ID, uniform_name.c_str()), 1, glm::value_ptr(data));
+}
+
+void Shader::setMat4(const std::string uniform_name, glm::mat4 data)
+{
+  glUniformMatrix4fv(glGetUniformLocation(this->ID, uniform_name.c_str()), 1, GL_FALSE, glm::value_ptr(data));
+}
+
 Shader::~Shader()
 {
   glDeleteProgram(ID);
