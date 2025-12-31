@@ -19,7 +19,7 @@ glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 
 float delta_time = 0.0f, last_frame = 0.0f, speed = 2.5f, sensitivity = 0.1f;
 float yaw = -90.0f, pitch = 0.0f, fov = 45.0f;
-float lastX = 800.0f/ 2.0f, lastY = 600.0f/ 2.0f;
+float lastX = 800.0f / 2.0f, lastY = 600.0f / 2.0f;
 bool first_mouse = true;
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
@@ -135,50 +135,6 @@ void processInput(GLFWwindow *window)
 
 void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 {
-  // std::cout << "mouse event" << std::endl;
-  float x = static_cast<float>(xpos);
-  float y = static_cast<float>(ypos);
-
-  if (first_mouse)
-  {
-    std::cout << "First mouse" << std::endl;
-    lastX = x;
-    lastY = y;
-    first_mouse = false;
-  }
-
-  float xoffset = x - lastX;
-  float yoffset = lastY - y;
-  lastX = x;
-  lastY = y;
-
-  xoffset *= sensitivity;
-  yoffset *= sensitivity;
-
-  yaw += xoffset;
-  pitch += yoffset;
-
-  if (pitch > 89.0f)
-    pitch = 89.0f;
-  if (pitch < -89.0f)
-    pitch = -89.0f;
-
-  glm::vec3 direction;
-  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  direction.y = sin(glm::radians(pitch));
-  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-
-  front = glm::normalize(direction);
-  // std::cout << front.x << "," << front.y << "," << front.z << std::endl;
 }
 
-void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
-{
-  std::cout << "scorll event" << std::endl;
-
-  fov -= (float)yoffset;
-  if (fov < 1.0f)
-    fov = 1.0f;
-  if (fov > 45.0f)
-    fov = 45.0f;
-}
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {}

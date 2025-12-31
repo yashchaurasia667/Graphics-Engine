@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -27,5 +26,3 @@ public:
   void setMat4(const std::string uniform_name, glm::mat4 data);
   ~Shader();
 };
-
-#endif
